@@ -1,0 +1,34 @@
+name: Generate snake animation
+
+on:
+  schedule:
+    - cron: "0 */6 * * *" # every 6 hours
+  workflow_dispatch:
+
+jobs:
+  generate:
+    runs-on: "ubuntu-latest"
+    timeout-minutes: 10
+
+    steps:
+      # generates a snake game from a github user (<github_user_name>) contributions graph, output a svg animation at <svg_out_path>
+      - name: "generate snake.svg"
+        uses: "Platane/snk/svg-only@v2"
+        with:
+          github_user_name: "${{ github.repository_owner }}"
+          outputs: "dist/snake.svg"
+
+      # push the content of <build_dir> to a branch
+      # the content will be available at https://raw.githubusercontent.com/<github_user>/<repository>/<target_branch>/<file> , or as github page
+      - name: "push snake.svg to the main branch"
+        uses: "crazy-max/ghaction-github-pages@v3"
+        with:
+          target_branch: "main"
+          keep_history: true
+          build_dir: "dist"
+          committer: "Mejituu <acgm@qq.com>"
+          author: "Mejituu <acgm@qq.com>"
+          commit_message: ":pencil: Docs: update snake.svg"
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
